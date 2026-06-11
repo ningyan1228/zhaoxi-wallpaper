@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>壁纸库 - 免费高清4K手机壁纸下载</title>
+  <meta name="description" content="免费高清壁纸下载网站，提供足球壁纸、动漫壁纸、风景壁纸、手机壁纸、游戏壁纸。">
+  <meta name="keywords" content="壁纸,4K壁纸,手机壁纸,足球壁纸,动漫壁纸">
+  <meta name="author" content="朝夕壁纸">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="朝夕壁纸 - 免费高清4K手机壁纸下载">
+  <meta property="og:description" content="探索头像、动漫、风景、足球、手机壁纸、游戏等免费高清4K壁纸。">
+  <meta property="og:image" content="images/og-cover.webp">
+  <meta property="og:url" content="https://example.com/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="朝夕壁纸 - 免费高清4K手机壁纸下载">
+  <meta name="twitter:description" content="免费高清壁纸下载网站，提供多分类4K手机壁纸。">
+  <meta name="twitter:image" content="images/og-cover.webp">
+  <link rel="canonical" href="https://example.com/">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="topbar" aria-label="主导航">
+      <a class="brand" href="/" aria-label="朝夕壁纸首页">
+        <span class="brand-logo" aria-hidden="true">
+          <span class="logo-orbit"></span>
+          <span class="logo-text">朝夕</span>
+        </span>
+        <span class="brand-copy">
+          <strong>壁纸库</strong>
+          <small>朝夕壁纸</small>
+        </span>
+      </a>
+
+      <label class="search" aria-label="搜索壁纸">
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="m21 21-4.35-4.35m1.35-5.15a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z"/>
+        </svg>
+        <input id="searchInput" type="search" placeholder="搜索标题、标签、分类..." autocomplete="off">
+      </label>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-copy">
+        <p class="eyebrow">Wallpaper Gallery</p>
+        <h1 id="heroTitle">朝夕壁纸</h1>
+        <p class="hero-text">自制高清壁纸，把每一次打开屏幕都变成片刻好风景。</p>
+      </div>
+      <div class="hero-stats" aria-label="壁纸概览">
+        <span><strong id="totalCount">36</strong> 张精选</span>
+        <span><strong id="categoryCount">8</strong> 个分类</span>
+        <span><strong>4K</strong> 高清</span>
+      </div>
+    </section>
+
+    <section class="filters" aria-label="壁纸分类">
+      <button class="filter-btn active" type="button" data-category="全部">全部</button>
+      <button class="filter-btn" type="button" data-category="头像">头像</button>
+      <button class="filter-btn" type="button" data-category="手机壁纸">手机壁纸</button>
+      <button class="filter-btn" type="button" data-category="横屏壁纸">横屏壁纸</button>
+      <button class="filter-btn" type="button" data-category="动漫">动漫</button>
+      <button class="filter-btn" type="button" data-category="风景">风景</button>
+      <button class="filter-btn" type="button" data-category="足球">足球</button>
+      <button class="filter-btn" type="button" data-category="文字壁纸">文字壁纸</button>
+    </section>
+
+    <section class="hot-rank" aria-labelledby="hotRankTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Hot Picks</p>
+          <h2 id="hotRankTitle">全站热榜</h2>
+        </div>
+        <p id="hotRankStatus" class="result-count">正在加载...</p>
+      </div>
+      <div class="hot-tabs" aria-label="热榜时间范围">
+        <button class="hot-tab" type="button" data-range="yesterday">昨日热门</button>
+        <button class="hot-tab active" type="button" data-range="3d">近三天热门</button>
+        <button class="hot-tab" type="button" data-range="7d">近一周热门</button>
+        <button class="hot-tab" type="button" data-range="year">今年热榜</button>
+      </div>
+      <div id="hotRankGrid" class="hot-grid" aria-live="polite"></div>
+      <nav id="hotPagination" class="pagination" aria-label="热榜分页"></nav>
+      <div id="hotRankEmpty" class="empty-state" hidden>
+        <strong>暂无热榜数据</strong>
+        <span>有点击记录后这里会自动更新。</span>
+      </div>
+    </section>
+
+    <section class="gallery-shell" aria-labelledby="galleryTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Collection</p>
+          <h2 id="galleryTitle">精选壁纸</h2>
+        </div>
+        <p id="resultCount" class="result-count">正在加载...</p>
+      </div>
+      <div id="gallery" class="masonry" aria-live="polite"></div>
+      <nav id="galleryPagination" class="pagination" aria-label="壁纸分页"></nav>
+      <div id="emptyState" class="empty-state" hidden>
+        <strong>没有找到匹配的壁纸</strong>
+        <span>换个关键词或分类试试看。</span>
+      </div>
+    </section>
+  </main>
+
+  <div id="modal" class="modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-backdrop" data-close-modal></div>
+    <article class="modal-panel">
+      <button class="modal-close" type="button" aria-label="关闭弹窗" data-close-modal>
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+      <div class="modal-preview">
+        <img id="modalImage" alt="">
+      </div>
+      <div class="modal-content">
+        <span id="modalCategory" class="category-pill"></span>
+        <h2 id="modalTitle"></h2>
+        <div id="modalTags" class="tag-list"></div>
+        <button id="downloadBtn" class="download-btn" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24">
+            <path d="M12 3v12m0 0 5-5m-5 5-5-5M4 21h16"/>
+          </svg>
+          下载高清原图
+        </button>
+        <section class="recommend-section" aria-labelledby="recommendTitle">
+          <h3 id="recommendTitle">相关推荐</h3>
+          <div id="recommendations" class="recommend-grid"></div>
+        </section>
+      </div>
+    </article>
+  </div>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
