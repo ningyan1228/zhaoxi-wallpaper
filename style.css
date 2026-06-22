@@ -289,12 +289,25 @@ main {
   box-shadow: 0 14px 32px rgba(10, 132, 255, 0.26);
 }
 
+.random-btn {
+  border-color: rgba(100, 210, 255, 0.28);
+  color: #d8ecff;
+}
+
 .hot-rank {
   padding: 20px 0 10px;
 }
 
 main.scoped-view .hot-rank {
   padding-top: 8px;
+}
+
+.latest-section {
+  padding: 18px 0 8px;
+}
+
+main.scoped-view .latest-section {
+  display: none;
 }
 
 .hot-tabs {
@@ -333,13 +346,15 @@ main.scoped-view .hot-rank {
   background: rgba(10, 132, 255, 0.2);
 }
 
-.hot-grid {
+.hot-grid,
+.latest-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 20px;
 }
 
-.hot-grid .wallpaper-card {
+.hot-grid .wallpaper-card,
+.latest-grid .wallpaper-card {
   display: block;
   width: 100%;
   margin: 0;
@@ -756,6 +771,25 @@ main.scoped-view .gallery-shell {
   box-shadow: 0 24px 44px rgba(59, 130, 246, 0.36);
 }
 
+.copy-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  color: #d8ecff;
+  background: rgba(255, 255, 255, 0.08);
+  font-weight: 800;
+  transition: transform var(--duration), border-color var(--duration), background var(--duration);
+}
+
+.copy-link-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(100, 210, 255, 0.36);
+  background: rgba(10, 132, 255, 0.16);
+}
+
 .recommend-section h3 {
   margin: 0 0 12px;
 }
@@ -798,7 +832,8 @@ main.scoped-view .gallery-shell {
     gap: 18px;
   }
 
-  .hot-grid {
+  .hot-grid,
+  .latest-grid {
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
     gap: 18px;
   }
@@ -850,7 +885,8 @@ main.scoped-view .gallery-shell {
     gap: 12px;
   }
 
-  .hot-grid {
+  .hot-grid,
+  .latest-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }

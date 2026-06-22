@@ -69,6 +69,7 @@
       <button class="filter-btn" type="button" data-category="风景">风景</button>
       <button class="filter-btn" type="button" data-category="足球">足球</button>
       <button class="filter-btn" type="button" data-category="文字壁纸">文字壁纸</button>
+      <button id="randomBtn" class="filter-btn random-btn" type="button">随机看看</button>
     </section>
 
     <section class="hot-rank" aria-labelledby="hotRankTitle">
@@ -91,6 +92,17 @@
         <strong>暂无热榜数据</strong>
         <span>有点击记录后这里会自动更新。</span>
       </div>
+    </section>
+
+    <section class="latest-section" aria-labelledby="latestTitle">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">New Arrivals</p>
+          <h2 id="latestTitle">最新上架</h2>
+        </div>
+        <p id="latestStatus" class="result-count">最近更新 12 张</p>
+      </div>
+      <div id="latestGrid" class="latest-grid" aria-live="polite"></div>
     </section>
 
     <section class="gallery-shell" aria-labelledby="galleryTitle">
@@ -131,6 +143,7 @@
           </svg>
           下载高清原图
         </button>
+        <button id="copyLinkBtn" class="copy-link-btn" type="button">复制网盘链接</button>
         <section class="recommend-section" aria-labelledby="recommendTitle">
           <h3 id="recommendTitle">相关推荐</h3>
           <div id="recommendations" class="recommend-grid"></div>

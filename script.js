@@ -8,6 +8,7 @@ const HOT_RANGE_LABELS = {
 };
 const GALLERY_PAGE_SIZE = 12;
 const HOT_PAGE_SIZE = 8;
+const LATEST_COUNT = 12;
 const NETLIFY_API_ORIGIN = "https://zhaoxi-wallpaper-20260609.netlify.app";
 
 const state = {
@@ -51,12 +52,15 @@ const els = {
   filterButtons: document.querySelectorAll(".filter-btn"),
   hotTabs: document.querySelectorAll(".hot-tab"),
   hotRankSection: document.querySelector(".hot-rank"),
+  latestSection: document.querySelector(".latest-section"),
   gallerySection: document.querySelector(".gallery-shell"),
   galleryTitle: document.querySelector("#galleryTitle"),
   hotRankTitle: document.querySelector("#hotRankTitle"),
   hotRankGrid: document.querySelector("#hotRankGrid"),
   hotRankEmpty: document.querySelector("#hotRankEmpty"),
   hotRankStatus: document.querySelector("#hotRankStatus"),
+  latestGrid: document.querySelector("#latestGrid"),
+  latestStatus: document.querySelector("#latestStatus"),
   hotPagination: document.querySelector("#hotPagination"),
   galleryPagination: document.querySelector("#galleryPagination"),
   resultCount: document.querySelector("#resultCount"),
@@ -69,6 +73,8 @@ const els = {
   modalCategory: document.querySelector("#modalCategory"),
   modalTags: document.querySelector("#modalTags"),
   downloadBtn: document.querySelector("#downloadBtn"),
+  copyLinkBtn: document.querySelector("#copyLinkBtn"),
+  randomBtn: document.querySelector("#randomBtn"),
   recommendations: document.querySelector("#recommendations"),
 };
 
@@ -106,6 +112,7 @@ async function init() {
 
   bindEvents();
   renderGallery();
+  renderLatest();
   renderHotRank();
   syncSectionOrder();
 }
@@ -137,6 +144,8 @@ function bindEvents() {
     });
   });
 
+  els.randomBtn?.addEventListener("click", openRandomWallpaper);
+
   document.querySelectorAll("[data-close-modal]").forEach((node) => {
     node.addEventListener("click", closeModal);
   });
@@ -150,6 +159,8 @@ function bindEvents() {
       window.open(state.activeWallpaper.quarkUrl, "_blank", "noopener,noreferrer");
     }
   });
+
+  els.copyLinkBtn?.addEventListener("click", copyActiveWallpaperLink);
 }
 
 function getFilteredWallpapers() {
@@ -251,6 +262,26 @@ function renderGallery() {
   });
   observeCards(els.gallery);
   observeLazyImages(els.gallery);
+}
+
+function renderLatest() {
+  if (!els.latestGrid) return;
+
+  const latest = [...state.wallpapers]
+    .sort((a, b) => Number(b.id) - Number(a.id))
+    .slice(0, LATEST_COUNT);
+
+  els.latestGrid.innerHTML = "";
+  if (els.latestStatus) els.latestStatus.textContent = `最近更新 ${latest.length} 张`;
+
+  const fragment = document.createDocumentFragment();
+  latest.forEach((item) => {
+    fragment.appendChild(createWallpaperCard(item));
+  });
+
+  els.latestGrid.appendChild(fragment);
+  observeCards(els.latestGrid);
+  observeLazyImages(els.latestGrid);
 }
 
 function updateGalleryEmptyState() {
@@ -447,6 +478,7 @@ function openModal(item) {
   els.modalTitle.textContent = item.title;
   els.modalCategory.textContent = item.category === item.usage ? item.category : `${item.category} · ${item.usage}`;
   els.modalTags.innerHTML = item.tags.map((tag) => `<span class="tag">#${escapeHtml(tag)}</span>`).join("");
+  if (els.copyLinkBtn) els.copyLinkBtn.textContent = "复制网盘链接";
 
   replaceModalImage(item);
   renderRecommendations(item);
@@ -463,6 +495,51 @@ function closeModal() {
   els.modal.setAttribute("aria-hidden", "true");
   document.body.classList.remove("modal-open");
   state.activeWallpaper = null;
+}
+
+function openRandomWallpaper() {
+  const list = getFilteredWallpapers();
+  const pool = list.length ? list : state.wallpapers;
+  if (!pool.length) return;
+  const index = Math.floor(Math.random() * pool.length);
+  openModal(pool[index]);
+}
+
+async function copyActiveWallpaperLink() {
+  const url = state.activeWallpaper?.quarkUrl;
+  if (!url) return;
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(url);
+    } else {
+      fallbackCopyText(url);
+    }
+    setCopyButtonText("已复制链接");
+  } catch {
+    fallbackCopyText(url);
+    setCopyButtonText("已复制链接");
+  }
+}
+
+function fallbackCopyText(text) {
+  const input = document.createElement("textarea");
+  input.value = text;
+  input.setAttribute("readonly", "");
+  input.style.position = "fixed";
+  input.style.left = "-9999px";
+  document.body.appendChild(input);
+  input.select();
+  document.execCommand("copy");
+  input.remove();
+}
+
+function setCopyButtonText(text) {
+  if (!els.copyLinkBtn) return;
+  els.copyLinkBtn.textContent = text;
+  window.setTimeout(() => {
+    if (els.copyLinkBtn) els.copyLinkBtn.textContent = "复制网盘链接";
+  }, 1600);
 }
 
 function renderRecommendations(item) {
