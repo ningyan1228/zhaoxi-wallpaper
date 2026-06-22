@@ -251,12 +251,13 @@ img {
 .search-overlay {
   position: fixed;
   inset: 0;
-  z-index: 29;
+  z-index: 40;
   background:
-    radial-gradient(circle at 50% 24%, rgba(47, 140, 255, 0.16), transparent 24rem),
-    rgba(3, 6, 14, 0.56);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+    radial-gradient(circle at 50% 45%, rgba(56, 189, 248, 0.13), transparent 25rem),
+    radial-gradient(circle at 50% 62%, rgba(124, 58, 237, 0.11), transparent 28rem),
+    rgba(3, 6, 14, 0.46);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 .search-overlay[hidden] {
@@ -265,9 +266,9 @@ img {
 
 body.search-active .search {
   position: fixed;
-  top: min(22vh, 180px);
+  top: 44vh;
   left: 50%;
-  z-index: 30;
+  z-index: 80;
   width: min(820px, calc(100vw - 36px));
   min-height: 62px;
   padding: 0 22px;
@@ -278,7 +279,16 @@ body.search-active .search {
     0 26px 90px rgba(0, 0, 0, 0.48),
     0 0 58px rgba(47, 140, 255, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.16);
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
+}
+
+body.search-active .site-header {
+  z-index: 70;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 body.search-active .search input {
@@ -318,32 +328,41 @@ main {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
   gap: 24px;
-  min-height: 240px;
-  padding: clamp(30px, 4.2vw, 54px);
+  min-height: clamp(340px, 35vw, 500px);
+  padding: clamp(34px, 5vw, 76px);
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 30px;
+  border-radius: 34px;
   background:
-    linear-gradient(110deg, rgba(47, 140, 255, 0.18), transparent 38%),
-    linear-gradient(250deg, rgba(167, 139, 250, 0.13), transparent 42%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035)),
-    var(--card);
+    linear-gradient(90deg, rgba(3, 7, 18, 0.86) 0%, rgba(3, 7, 18, 0.5) 42%, rgba(3, 7, 18, 0.16) 72%),
+    linear-gradient(180deg, rgba(3, 7, 18, 0.08) 0%, rgba(3, 7, 18, 0.64) 100%),
+    url("images/hero-earth-dawn.png") center / cover no-repeat;
   box-shadow:
-    0 28px 90px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  -webkit-backdrop-filter: saturate(180%) blur(24px);
-  backdrop-filter: saturate(180%) blur(24px);
+    0 34px 110px rgba(0, 0, 0, 0.42),
+    0 0 0 1px rgba(154, 215, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  isolation: isolate;
 }
 
 .hero::before {
   position: absolute;
   inset: 0;
-  background-image:
-    radial-gradient(rgba(255, 255, 255, 0.26) 1px, transparent 1.3px),
-    linear-gradient(115deg, transparent 18%, rgba(154, 215, 255, 0.08), transparent 58%);
-  background-size: 150px 150px, auto;
+  z-index: 0;
+  background:
+    radial-gradient(circle at 50% 43%, rgba(186, 230, 253, 0.34), transparent 18%),
+    linear-gradient(115deg, transparent 16%, rgba(96, 165, 250, 0.12), transparent 58%);
   content: "";
-  opacity: 0.28;
+  opacity: 0.72;
+  mix-blend-mode: screen;
+}
+
+.hero::after {
+  position: absolute;
+  inset: auto 28px 26px 28px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(186, 230, 253, 0.58), transparent);
+  content: "";
+  opacity: 0.72;
 }
 
 .hero > * {
@@ -361,28 +380,29 @@ main {
 }
 
 .hero h1 {
-  max-width: 700px;
+  max-width: 760px;
   margin: 0;
-  font-size: clamp(3rem, 6.3vw, 5.9rem);
-  line-height: 0.96;
+  font-size: clamp(3.6rem, 7.5vw, 7.2rem);
+  line-height: 0.9;
   letter-spacing: 0;
   text-shadow:
-    0 20px 58px rgba(47, 140, 255, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.12);
+    0 26px 70px rgba(3, 7, 18, 0.58),
+    0 0 34px rgba(147, 197, 253, 0.18);
 }
 
 .hero-text {
-  max-width: 680px;
-  margin: 16px 0 0;
-  color: rgba(226, 232, 240, 0.82);
-  font-size: clamp(0.98rem, 1.55vw, 1.12rem);
-  line-height: 1.75;
+  max-width: 720px;
+  margin: 20px 0 0;
+  color: rgba(226, 232, 240, 0.9);
+  font-size: clamp(1.02rem, 1.7vw, 1.28rem);
+  line-height: 1.7;
+  text-shadow: 0 12px 34px rgba(3, 7, 18, 0.75);
 }
 
 .hero-stats {
   display: grid;
   gap: 12px;
-  min-width: 180px;
+  min-width: 210px;
 }
 
 .hero-stats span {
@@ -390,14 +410,17 @@ main {
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  min-height: 46px;
-  padding: 0 15px;
-  border: 1px solid rgba(255, 255, 255, 0.11);
-  border-radius: 17px;
-  background: rgba(255, 255, 255, 0.055);
+  min-height: 54px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 20px;
+  background: rgba(8, 13, 26, 0.34);
   color: rgba(203, 213, 225, 0.9);
-  -webkit-backdrop-filter: blur(18px);
-  backdrop-filter: blur(18px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 18px 46px rgba(0, 0, 0, 0.18);
+  -webkit-backdrop-filter: saturate(170%) blur(22px);
+  backdrop-filter: saturate(170%) blur(22px);
 }
 
 .hero-stats strong {
@@ -406,10 +429,12 @@ main {
 
 .filters {
   position: relative;
+  z-index: 15;
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   padding: 20px 0 14px;
-  overflow-x: auto;
+  overflow: visible;
   scrollbar-width: none;
 }
 
@@ -473,7 +498,7 @@ main {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  z-index: 12;
+  z-index: 60;
   display: grid;
   min-width: 180px;
   padding: 8px;
@@ -1124,7 +1149,8 @@ main.scoped-view .gallery-shell {
 
   .hero {
     grid-template-columns: 1fr;
-    min-height: 220px;
+    min-height: 360px;
+    background-position: center top;
   }
 
   .hero-stats {
@@ -1148,13 +1174,14 @@ main.scoped-view .gallery-shell {
   }
 
   .hero {
-    min-height: 210px;
+    min-height: 390px;
     padding: 26px 22px;
     border-radius: 24px;
+    background-position: 55% center;
   }
 
   .hero h1 {
-    font-size: clamp(2.8rem, 15vw, 4.2rem);
+    font-size: clamp(3.1rem, 18vw, 4.8rem);
   }
 
   .hero-text {
@@ -1163,6 +1190,16 @@ main.scoped-view .gallery-shell {
 
   .hero-stats {
     grid-template-columns: 1fr;
+  }
+
+  .filters {
+    gap: 8px;
+  }
+
+  .filter-menu-panel {
+    right: auto;
+    left: 0;
+    min-width: min(220px, calc(100vw - 24px));
   }
 
   .section-heading {
