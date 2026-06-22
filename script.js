@@ -1,13 +1,15 @@
 const FILTERS = ["全部", "头像", "手机壁纸", "横屏壁纸", "动漫", "风景", "足球", "文字壁纸"];
 const USAGE_FILTERS = new Set(["头像", "手机壁纸", "横屏壁纸"]);
+const MENU_FILTERS = new Set(["动漫", "风景", "足球", "文字壁纸"]);
+const CATEGORY_LABELS = {
+  "横屏壁纸": "电脑壁纸",
+};
 const HOT_RANGE_LABELS = {
   yesterday: "昨日热门",
   "3d": "近三天热门",
   "7d": "近一周热门",
   year: "今年热榜",
 };
-const GALLERY_PAGE_SIZE = 12;
-const HOT_PAGE_SIZE = 8;
 const LATEST_COUNT = 12;
 const NETLIFY_API_ORIGIN = "https://zhaoxi-wallpaper-20260609.netlify.app";
 
@@ -48,8 +50,12 @@ const fallbackWallpapers = fallbackSeeds.map(([title, image, category, usage, ta
 const els = {
   main: document.querySelector("main"),
   gallery: document.querySelector("#gallery"),
+  search: document.querySelector(".search"),
   searchInput: document.querySelector("#searchInput"),
-  filterButtons: document.querySelectorAll(".filter-btn"),
+  searchOverlay: document.querySelector("#searchOverlay"),
+  filterButtons: document.querySelectorAll("[data-category]"),
+  filterMenuToggle: document.querySelector("#filterMenuToggle"),
+  filterMenu: document.querySelector("#filterMenu"),
   hotTabs: document.querySelectorAll(".hot-tab"),
   hotRankSection: document.querySelector(".hot-rank"),
   latestSection: document.querySelector(".latest-section"),
@@ -118,6 +124,10 @@ async function init() {
 }
 
 function bindEvents() {
+  els.search?.addEventListener("click", openSearchOverlay);
+  els.searchInput.addEventListener("focus", openSearchOverlay);
+  els.searchOverlay?.addEventListener("click", closeSearchOverlay);
+
   els.searchInput.addEventListener("input", (event) => {
     state.query = event.target.value.trim().toLowerCase();
     state.galleryPage = 1;
@@ -130,9 +140,15 @@ function bindEvents() {
       state.activeCategory = button.dataset.category;
       state.galleryPage = 1;
       state.hotPage = 1;
-      els.filterButtons.forEach((item) => item.classList.toggle("active", item === button));
+      closeFilterMenu();
+      updateFilterActiveState();
       renderPage();
     });
+  });
+
+  els.filterMenuToggle?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleFilterMenu();
   });
 
   els.hotTabs.forEach((button) => {
@@ -144,14 +160,30 @@ function bindEvents() {
     });
   });
 
-  els.randomBtn?.addEventListener("click", openRandomWallpaper);
+  els.randomBtn?.addEventListener("click", () => {
+    closeFilterMenu();
+    openRandomWallpaper();
+  });
 
   document.querySelectorAll("[data-close-modal]").forEach((node) => {
     node.addEventListener("click", closeModal);
   });
 
+  document.addEventListener("click", (event) => {
+    if (!els.filterMenu?.hidden && !event.target.closest(".filter-menu")) closeFilterMenu();
+  });
+
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && els.modal.classList.contains("open")) closeModal();
+    if (event.key !== "Escape") return;
+    if (document.body.classList.contains("search-active")) {
+      closeSearchOverlay();
+      return;
+    }
+    if (!els.filterMenu?.hidden) {
+      closeFilterMenu();
+      return;
+    }
+    if (els.modal.classList.contains("open")) closeModal();
   });
 
   els.downloadBtn.addEventListener("click", () => {
@@ -161,6 +193,46 @@ function bindEvents() {
   });
 
   els.copyLinkBtn?.addEventListener("click", copyActiveWallpaperLink);
+
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(() => {
+      renderGallery();
+      renderHotCards();
+    }, 160);
+  });
+}
+
+function openSearchOverlay() {
+  document.body.classList.add("search-active");
+  if (els.searchOverlay) els.searchOverlay.hidden = false;
+}
+
+function closeSearchOverlay() {
+  document.body.classList.remove("search-active");
+  if (els.searchOverlay) els.searchOverlay.hidden = true;
+  els.searchInput.blur();
+}
+
+function toggleFilterMenu() {
+  if (!els.filterMenu || !els.filterMenuToggle) return;
+  const nextOpen = els.filterMenu.hidden;
+  els.filterMenu.hidden = !nextOpen;
+  els.filterMenuToggle.setAttribute("aria-expanded", String(nextOpen));
+}
+
+function closeFilterMenu() {
+  if (!els.filterMenu || !els.filterMenuToggle) return;
+  els.filterMenu.hidden = true;
+  els.filterMenuToggle.setAttribute("aria-expanded", "false");
+}
+
+function updateFilterActiveState() {
+  els.filterButtons.forEach((item) => {
+    item.classList.toggle("active", item.dataset.category === state.activeCategory);
+  });
+  els.filterMenuToggle?.classList.toggle("active", MENU_FILTERS.has(state.activeCategory));
 }
 
 function getFilteredWallpapers() {
@@ -189,7 +261,7 @@ function getCurrentScope() {
 
 function getScopeLabel() {
   if (state.query && state.activeCategory !== "全部") {
-    return `${state.activeCategory} · ${state.query}`;
+    return `${displayCategory(state.activeCategory)} · ${state.query}`;
   }
 
   if (state.query) {
@@ -197,7 +269,7 @@ function getScopeLabel() {
   }
 
   if (state.activeCategory !== "全部") {
-    return state.activeCategory;
+    return displayCategory(state.activeCategory);
   }
 
   return "全站";
@@ -205,7 +277,7 @@ function getScopeLabel() {
 
 function getGalleryTitle() {
   if (state.query && state.activeCategory !== "全部") {
-    return `${state.activeCategory}：${state.query}`;
+    return `${displayCategory(state.activeCategory)}：${state.query}`;
   }
 
   if (state.query) {
@@ -213,7 +285,7 @@ function getGalleryTitle() {
   }
 
   if (state.activeCategory !== "全部") {
-    return state.activeCategory;
+    return displayCategory(state.activeCategory);
   }
 
   return "精选壁纸";
@@ -221,6 +293,10 @@ function getGalleryTitle() {
 
 function getHotRankTitle(scope = getCurrentScope()) {
   return scope.isScoped ? `${scope.label}热门榜` : "全站热榜";
+}
+
+function displayCategory(category) {
+  return CATEGORY_LABELS[category] || category;
 }
 
 function syncSectionOrder() {
@@ -237,9 +313,10 @@ function syncSectionOrder() {
 
 function renderGallery() {
   const list = getFilteredWallpapers();
-  const totalPages = getTotalPages(list.length, GALLERY_PAGE_SIZE);
+  const pageSize = getAdaptivePageSize("gallery");
+  const totalPages = getTotalPages(list.length, pageSize);
   state.galleryPage = clampPage(state.galleryPage, totalPages);
-  const pageItems = paginate(list, state.galleryPage, GALLERY_PAGE_SIZE);
+  const pageItems = paginate(list, state.galleryPage, pageSize);
 
   els.gallery.innerHTML = "";
   els.emptyState.hidden = list.length > 0;
@@ -331,9 +408,10 @@ async function renderHotRank() {
 }
 
 function renderHotCards(scope = getCurrentScope()) {
-  const totalPages = getTotalPages(state.hotEntries.length, HOT_PAGE_SIZE);
+  const pageSize = getAdaptivePageSize("hot");
+  const totalPages = getTotalPages(state.hotEntries.length, pageSize);
   state.hotPage = clampPage(state.hotPage, totalPages);
-  const ranked = paginate(state.hotEntries, state.hotPage, HOT_PAGE_SIZE);
+  const ranked = paginate(state.hotEntries, state.hotPage, pageSize);
 
   els.hotRankGrid.innerHTML = "";
   els.hotRankEmpty.hidden = state.hotEntries.length > 0;
@@ -444,6 +522,19 @@ function paginate(items, page, pageSize) {
 
 function getTotalPages(totalItems, pageSize) {
   return Math.max(1, Math.ceil(totalItems / pageSize));
+}
+
+function getAdaptivePageSize(type = "gallery") {
+  const grid = type === "hot" ? els.hotRankGrid : els.gallery;
+  const width = grid?.clientWidth || Math.min(1760, Math.max(320, window.innerWidth - 40));
+  const height = window.innerHeight || 820;
+  const gap = window.innerWidth <= 760 ? 12 : type === "hot" ? 20 : 22;
+  const minCardWidth = window.innerWidth <= 520 ? 150 : window.innerWidth <= 900 ? 180 : 240;
+  const columns = Math.max(2, Math.floor((width + gap) / (minCardWidth + gap)));
+  const estimatedCardHeight = type === "hot" ? 330 : 350;
+  const rows = Math.max(2, Math.ceil((height * 0.95) / estimatedCardHeight));
+
+  return columns * rows;
 }
 
 function clampPage(page, totalPages) {

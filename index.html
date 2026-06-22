@@ -25,6 +25,7 @@
 </head>
 <body>
   <div class="stars" aria-hidden="true"></div>
+  <div id="searchOverlay" class="search-overlay" hidden></div>
   <header class="site-header">
     <nav class="topbar" aria-label="主导航">
       <a class="brand" href="/" aria-label="朝夕壁纸首页">
@@ -63,14 +64,19 @@
 
     <section class="filters" aria-label="壁纸分类">
       <button class="filter-btn active" type="button" data-category="全部">全部</button>
-      <button class="filter-btn" type="button" data-category="头像">头像</button>
       <button class="filter-btn" type="button" data-category="手机壁纸">手机壁纸</button>
-      <button class="filter-btn" type="button" data-category="横屏壁纸">横屏壁纸</button>
-      <button class="filter-btn" type="button" data-category="动漫">动漫</button>
-      <button class="filter-btn" type="button" data-category="风景">风景</button>
-      <button class="filter-btn" type="button" data-category="足球">足球</button>
-      <button class="filter-btn" type="button" data-category="文字壁纸">文字壁纸</button>
-      <button id="randomBtn" class="filter-btn random-btn" type="button">随机看看</button>
+      <button class="filter-btn" type="button" data-category="横屏壁纸">电脑壁纸</button>
+      <button class="filter-btn" type="button" data-category="头像">头像</button>
+      <div class="filter-menu">
+        <button id="filterMenuToggle" class="filter-btn filter-menu-toggle" type="button" aria-expanded="false" aria-controls="filterMenu">筛选</button>
+        <div id="filterMenu" class="filter-menu-panel" hidden>
+          <button class="filter-menu-item" type="button" data-category="动漫">动漫</button>
+          <button class="filter-menu-item" type="button" data-category="风景">风景</button>
+          <button class="filter-menu-item" type="button" data-category="足球">足球</button>
+          <button class="filter-menu-item" type="button" data-category="文字壁纸">文字壁纸</button>
+          <button id="randomBtn" class="filter-menu-item random-btn" type="button">随机看看</button>
+        </div>
+      </div>
     </section>
 
     <section class="hot-rank" aria-labelledby="hotRankTitle">

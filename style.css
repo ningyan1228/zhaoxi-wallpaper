@@ -220,6 +220,8 @@ img {
 }
 
 .search {
+  position: relative;
+  z-index: 31;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -234,7 +236,7 @@ img {
     0 16px 40px rgba(0, 0, 0, 0.18);
   -webkit-backdrop-filter: saturate(180%) blur(22px);
   backdrop-filter: saturate(180%) blur(22px);
-  transition: border-color var(--duration), box-shadow var(--duration), background var(--duration);
+  transition: transform var(--duration), width var(--duration), border-color var(--duration), box-shadow var(--duration), background var(--duration);
 }
 
 .search:focus-within {
@@ -244,6 +246,43 @@ img {
     0 0 0 5px rgba(10, 132, 255, 0.14),
     0 20px 46px rgba(0, 0, 0, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 29;
+  background:
+    radial-gradient(circle at 50% 24%, rgba(47, 140, 255, 0.16), transparent 24rem),
+    rgba(3, 6, 14, 0.56);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.search-overlay[hidden] {
+  display: none;
+}
+
+body.search-active .search {
+  position: fixed;
+  top: min(22vh, 180px);
+  left: 50%;
+  z-index: 30;
+  width: min(820px, calc(100vw - 36px));
+  min-height: 62px;
+  padding: 0 22px;
+  border-color: rgba(154, 215, 255, 0.68);
+  background: rgba(12, 18, 34, 0.86);
+  box-shadow:
+    0 0 0 1px rgba(154, 215, 255, 0.16),
+    0 26px 90px rgba(0, 0, 0, 0.48),
+    0 0 58px rgba(47, 140, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  transform: translateX(-50%);
+}
+
+body.search-active .search input {
+  font-size: 1.08rem;
 }
 
 .search svg {
@@ -366,6 +405,7 @@ main {
 }
 
 .filters {
+  position: relative;
   display: flex;
   gap: 10px;
   padding: 20px 0 14px;
@@ -411,6 +451,61 @@ main {
 .random-btn {
   border-color: rgba(100, 210, 255, 0.28);
   color: #d8ecff;
+}
+
+.filter-menu {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.filter-menu-toggle::after {
+  margin-left: 8px;
+  color: currentColor;
+  content: "⌄";
+  font-size: 0.82em;
+}
+
+.filter-menu-toggle[aria-expanded="true"]::after {
+  content: "⌃";
+}
+
+.filter-menu-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 12;
+  display: grid;
+  min-width: 180px;
+  padding: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 20px;
+  background: rgba(10, 16, 30, 0.88);
+  box-shadow: 0 22px 58px rgba(0, 0, 0, 0.36);
+  -webkit-backdrop-filter: saturate(180%) blur(22px);
+  backdrop-filter: saturate(180%) blur(22px);
+}
+
+.filter-menu-panel[hidden] {
+  display: none;
+}
+
+.filter-menu-item {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 14px;
+  color: #dbeafe;
+  background: transparent;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.filter-menu-item:hover,
+.filter-menu-item.active {
+  color: white;
+  background: rgba(47, 140, 255, 0.18);
 }
 
 .hot-rank {
