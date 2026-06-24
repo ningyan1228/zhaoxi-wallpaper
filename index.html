@@ -49,6 +49,40 @@
     </nav>
   </header>
 
+  <section id="searchPanel" class="search-panel" aria-label="搜索中心" hidden>
+    <div class="search-panel-head">
+      <div>
+        <p class="eyebrow">Search Center</p>
+        <h2>发现你想要的壁纸</h2>
+      </div>
+      <button id="searchClose" class="search-close" type="button" aria-label="关闭搜索">×</button>
+    </div>
+    <div class="search-panel-grid">
+      <section class="search-block">
+        <h3>热门关键词</h3>
+        <div id="searchKeywords" class="search-chip-row"></div>
+      </section>
+      <section class="search-block">
+        <h3>快捷分类</h3>
+        <div id="searchCategories" class="search-chip-row"></div>
+      </section>
+    </div>
+    <section class="search-block">
+      <div class="search-block-title">
+        <h3>最近上架</h3>
+        <span id="searchLatestCount">12 张</span>
+      </div>
+      <div id="searchLatest" class="search-mini-grid"></div>
+    </section>
+    <section class="search-block search-results-block">
+      <div class="search-block-title">
+        <h3>实时搜索结果</h3>
+        <span id="searchResultStatus">输入关键词开始搜索</span>
+      </div>
+      <div id="searchResults" class="search-mini-grid"></div>
+    </section>
+  </section>
+
   <main>
     <section class="hero" aria-labelledby="heroTitle">
       <div class="hero-copy">

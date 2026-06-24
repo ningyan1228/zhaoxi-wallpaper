@@ -11,6 +11,8 @@ const HOT_RANGE_LABELS = {
   year: "今年热榜",
 };
 const LATEST_COUNT = 12;
+const SEARCH_LATEST_COUNT = 6;
+const SEARCH_RESULT_COUNT = 8;
 const NETLIFY_API_ORIGIN = "https://zhaoxi-wallpaper-20260609.netlify.app";
 
 const state = {
@@ -53,6 +55,14 @@ const els = {
   search: document.querySelector(".search"),
   searchInput: document.querySelector("#searchInput"),
   searchOverlay: document.querySelector("#searchOverlay"),
+  searchPanel: document.querySelector("#searchPanel"),
+  searchClose: document.querySelector("#searchClose"),
+  searchKeywords: document.querySelector("#searchKeywords"),
+  searchCategories: document.querySelector("#searchCategories"),
+  searchLatest: document.querySelector("#searchLatest"),
+  searchLatestCount: document.querySelector("#searchLatestCount"),
+  searchResults: document.querySelector("#searchResults"),
+  searchResultStatus: document.querySelector("#searchResultStatus"),
   filterButtons: document.querySelectorAll("[data-category]"),
   filterMenuToggle: document.querySelector("#filterMenuToggle"),
   filterMenu: document.querySelector("#filterMenu"),
@@ -127,12 +137,43 @@ function bindEvents() {
   els.search?.addEventListener("click", openSearchOverlay);
   els.searchInput.addEventListener("focus", openSearchOverlay);
   els.searchOverlay?.addEventListener("click", closeSearchOverlay);
+  els.searchClose?.addEventListener("click", closeSearchOverlay);
 
   els.searchInput.addEventListener("input", (event) => {
     state.query = event.target.value.trim().toLowerCase();
     state.galleryPage = 1;
     state.hotPage = 1;
     renderPage();
+    renderSearchPanel();
+  });
+
+  els.searchKeywords?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-keyword]");
+    if (!button) return;
+    setSearchQuery(button.dataset.keyword);
+  });
+
+  els.searchCategories?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-category]");
+    if (!button) return;
+    state.activeCategory = button.dataset.category;
+    state.query = "";
+    els.searchInput.value = "";
+    state.galleryPage = 1;
+    state.hotPage = 1;
+    updateFilterActiveState();
+    closeSearchOverlay();
+    renderPage();
+    scrollToSection(els.gallerySection);
+  });
+
+  els.searchPanel?.addEventListener("click", (event) => {
+    const card = event.target.closest("[data-search-id]");
+    if (!card) return;
+    const item = state.wallpapers.find((wallpaper) => wallpaper.id === Number(card.dataset.searchId));
+    if (!item) return;
+    closeSearchOverlay();
+    openModal(item);
   });
 
   els.filterButtons.forEach((button) => {
@@ -205,14 +246,130 @@ function bindEvents() {
 }
 
 function openSearchOverlay() {
+  const wasActive = document.body.classList.contains("search-active");
   document.body.classList.add("search-active");
   if (els.searchOverlay) els.searchOverlay.hidden = false;
+  if (els.searchPanel) els.searchPanel.hidden = false;
+  renderSearchPanel();
+  if (!wasActive) {
+    window.requestAnimationFrame(() => {
+      els.searchInput.focus({ preventScroll: true });
+    });
+  }
 }
 
 function closeSearchOverlay() {
   document.body.classList.remove("search-active");
   if (els.searchOverlay) els.searchOverlay.hidden = true;
+  if (els.searchPanel) els.searchPanel.hidden = true;
   els.searchInput.blur();
+}
+
+function setSearchQuery(keyword) {
+  state.query = keyword.trim().toLowerCase();
+  els.searchInput.value = keyword;
+  state.galleryPage = 1;
+  state.hotPage = 1;
+  renderPage();
+  renderSearchPanel();
+}
+
+function renderSearchPanel() {
+  if (!els.searchPanel || els.searchPanel.hidden || !state.wallpapers.length) return;
+  renderSearchKeywords();
+  renderSearchCategories();
+  renderSearchLatest();
+  renderSearchResults();
+}
+
+function renderSearchKeywords() {
+  if (!els.searchKeywords) return;
+  const seeds = ["情侣", "头像", "治愈", "动漫", "足球", "梅西", "古风", "文字壁纸", "可爱", "夏日"];
+  const counts = new Map();
+
+  state.wallpapers.forEach((item) => {
+    [item.category, item.usage, ...item.tags].forEach((tag) => {
+      if (!tag) return;
+      counts.set(tag, (counts.get(tag) || 0) + 1);
+    });
+  });
+
+  const keywords = [...new Set([
+    ...seeds,
+    ...[...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([tag]) => tag),
+  ])].slice(0, 12);
+
+  els.searchKeywords.innerHTML = keywords.map((keyword) => (
+    `<button class="search-chip" type="button" data-keyword="${escapeAttribute(keyword)}">${escapeHtml(keyword)}</button>`
+  )).join("");
+}
+
+function renderSearchCategories() {
+  if (!els.searchCategories) return;
+  const categories = [
+    ["手机壁纸", "手机壁纸"],
+    ["电脑壁纸", "横屏壁纸"],
+    ["头像", "头像"],
+    ["动漫", "动漫"],
+    ["风景", "风景"],
+    ["足球", "足球"],
+    ["文字壁纸", "文字壁纸"],
+  ];
+
+  els.searchCategories.innerHTML = categories.map(([label, value]) => (
+    `<button class="search-chip category" type="button" data-category="${escapeAttribute(value)}">${escapeHtml(label)}</button>`
+  )).join("");
+}
+
+function renderSearchLatest() {
+  if (!els.searchLatest) return;
+  const latest = [...state.wallpapers]
+    .sort((a, b) => Number(b.id) - Number(a.id))
+    .slice(0, SEARCH_LATEST_COUNT);
+  if (els.searchLatestCount) els.searchLatestCount.textContent = `${latest.length} 张`;
+  renderSearchMiniCards(els.searchLatest, latest);
+}
+
+function renderSearchResults() {
+  if (!els.searchResults || !els.searchResultStatus) return;
+  const query = state.query.trim();
+  if (!query) {
+    els.searchResultStatus.textContent = "输入关键词开始搜索";
+    els.searchResults.innerHTML = `<div class="search-hint">可以搜标题、标签、分类，比如“情侣”“梅西”“古风”。</div>`;
+    return;
+  }
+
+  const results = state.wallpapers
+    .filter((item) => wallpaperMatchesQuery(item, query))
+    .slice(0, SEARCH_RESULT_COUNT);
+
+  els.searchResultStatus.textContent = results.length ? `找到 ${results.length} 张相关壁纸` : "没有匹配结果";
+  if (!results.length) {
+    els.searchResults.innerHTML = `<div class="search-hint">换个关键词试试，或者点上面的热门关键词。</div>`;
+    return;
+  }
+
+  renderSearchMiniCards(els.searchResults, results);
+}
+
+function wallpaperMatchesQuery(item, query) {
+  const searchable = `${item.title} ${item.category} ${item.usage} ${item.tags.join(" ")}`.toLowerCase();
+  return searchable.includes(query.toLowerCase());
+}
+
+function renderSearchMiniCards(root, items) {
+  root.innerHTML = items.map((item) => `
+    <button class="search-mini-card" type="button" data-search-id="${item.id}" style="--ratio: ${getRatio(item)}">
+      <span class="search-mini-thumb">${imageMarkup(item.cover, item.title)}</span>
+      <span class="search-mini-info">
+        <strong>${escapeHtml(item.title)}</strong>
+        <small>${escapeHtml(item.category === item.usage ? item.category : `${item.category} · ${item.usage}`)}</small>
+      </span>
+    </button>
+  `).join("");
+  observeLazyImages(root);
 }
 
 function toggleFilterMenu() {
